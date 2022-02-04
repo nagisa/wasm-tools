@@ -270,6 +270,8 @@ impl PeepholeMutationAnalysis {
             Lang::I64UseGlobal(_) => Ok(PrimitiveTypeInfo::I64),
             Lang::F32UseGlobal(_) => Ok(PrimitiveTypeInfo::F32),
             Lang::F64UseGlobal(_) => Ok(PrimitiveTypeInfo::F64),
+            Lang::FuncRefNull => Ok(PrimitiveTypeInfo::FuncRef),
+            Lang::ExternRefNull => Ok(PrimitiveTypeInfo::ExternRef),
         }
     }
 }

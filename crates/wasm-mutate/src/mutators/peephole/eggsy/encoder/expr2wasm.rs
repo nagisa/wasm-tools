@@ -770,6 +770,13 @@ pub fn expr2wasm(
                         newfunc.instruction(&Instruction::GlobalGet(global_idx));
                         global_idx += 1;
                     }
+                    Lang::FuncRefNull => {
+                        newfunc.instruction(&Instruction::RefNull(wasm_encoder::ValType::FuncRef));
+                    }
+                    Lang::ExternRefNull => {
+                        newfunc
+                            .instruction(&Instruction::RefNull(wasm_encoder::ValType::ExternRef));
+                    }
                 }
             }
         }

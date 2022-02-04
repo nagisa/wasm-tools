@@ -704,6 +704,10 @@ lang! {
         F32(u32) = "f32.const",
         /// F64 constant node
         F64(u64) = "f64.const",
+        /// constant ref.null funcref node
+        FuncRefNull = "funcref.null",
+        /// constant ref.null externref node
+        ExternRefNull = "externref.null",
     }
 }
 
