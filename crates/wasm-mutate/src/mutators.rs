@@ -30,6 +30,7 @@ pub mod remove_item;
 pub mod rename_export;
 pub mod snip_function;
 pub mod start;
+pub mod modify_init_exprs;
 
 mod translate;
 pub use self::translate::Item;

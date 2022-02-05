@@ -58,6 +58,10 @@ pub trait Translator {
         init_expr(self.as_obj(), e)
     }
 
+    fn translate_element_table_offset(&mut self, e: &InitExpr<'_>) -> Result<Instruction<'static>> {
+        init_expr(self.as_obj(), e)
+    }
+
     fn translate_element(
         &mut self,
         e: wasmparser::Element<'_>,
@@ -207,7 +211,7 @@ pub fn element(
             table_index,
             init_expr,
         } => {
-            offset = t.translate_init_expr(init_expr)?;
+            offset = t.translate_element_table_offset(init_expr)?;
             ElementMode::Active {
                 table: Some(t.remap(Item::Table, *table_index)?),
                 offset: &offset,

@@ -19,7 +19,8 @@ pub use error::*;
 use crate::mutators::{
     codemotion::CodemotionMutator, custom::RemoveCustomSection,
     function_body_unreachable::FunctionBodyUnreachable, modify_data::ModifyDataMutator,
-    peephole::PeepholeMutator, remove_export::RemoveExportMutator, remove_item::RemoveItemMutator,
+    modify_init_exprs::InitExpressionMutator, peephole::PeepholeMutator,
+    remove_export::RemoveExportMutator, remove_item::RemoveItemMutator,
     rename_export::RenameExportMutator, snip_function::SnipMutator, Item,
 };
 use info::ModuleInfo;
@@ -274,6 +275,8 @@ impl<'wasm> WasmMutate<'wasm> {
                 CodemotionMutator,
                 FunctionBodyUnreachable,
                 RemoveCustomSection,
+                InitExpressionMutator(Item::Global),
+                InitExpressionMutator(Item::Element),
                 RemoveItemMutator(Item::Function),
                 RemoveItemMutator(Item::Global),
                 RemoveItemMutator(Item::Memory),
