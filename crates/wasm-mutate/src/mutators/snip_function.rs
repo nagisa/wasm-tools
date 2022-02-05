@@ -87,7 +87,7 @@ impl Mutator for SnipMutator {
     }
 
     fn can_mutate<'a>(&self, config: &'a WasmMutate) -> bool {
-        !config.preserve_semantics && config.info().has_nonempty_code()
+        !config.preserve_semantics && config.info().num_local_functions() > 0
     }
 }
 

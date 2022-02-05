@@ -1,7 +1,7 @@
 //! This mutator applies a random peephole transformation to the input Wasm module.
 //!
 //! It builds a minimal DFG (Data Flow Graph) from a random operator selected
-//! from a random function inside the input Wasm. If this DFG is consistent and
+//! from a random function/global/elem inside the input Wasm. If this DFG is consistent and
 //! has no side-effects, and egraph is constructed with
 //! several hand-made rewriting rules. Random rewriting rules are selected and
 //! the DFG is replaced by a new one. The final step assembles all together with the
@@ -441,7 +441,7 @@ impl Mutator for PeepholeMutator {
     }
 
     fn can_mutate<'a>(&self, config: &'a WasmMutate) -> bool {
-        config.info().has_code() && config.info().num_local_functions() > 0
+        config.info().num_local_functions() > 0
     }
 }
 
