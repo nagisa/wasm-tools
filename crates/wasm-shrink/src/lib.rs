@@ -163,7 +163,7 @@ impl WasmShrink {
 
         let mut new_best = |old_best: &mut Vec<u8>, new: Vec<u8>| -> Result<()> {
             debug_assert!(
-                new.len() < old_best.len() || (new == EMPTY_WASM && *old_best == EMPTY_WASM)
+                new.len() <= old_best.len() || (new == EMPTY_WASM && *old_best == EMPTY_WASM)
             );
             log::info!("New smallest Wasm found: {} bytes", new.len());
             on_new_smallest(&new)?;
@@ -250,7 +250,7 @@ impl WasmShrink {
                     // TODO: This "shouldn't" happen when we set `.reduce(true)`
                     // on `WasmMutate`, but it does. This should turn into a
                     // `debug_assert!` once we fix `wasm-mutate`.
-                    if mutated_wasm.len() >= best.len() {
+                    if mutated_wasm.len() > best.len() {
                         log::trace!(
                             "Attempt #{}: mutated Wasm ({} bytes) is not smaller than \
                              best ({} bytes)",
