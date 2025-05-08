@@ -474,7 +474,7 @@ impl<'a> Module<'a> {
     fn operators(&mut self, reader: BinaryReader<'a>) -> Result<()> {
         let mut ops = OperatorsReader::new(reader);
         while !ops.eof() {
-            ops.visit_operator(self)?;
+            ops.visit_operator_with_simd(self)?;
         }
         ops.finish()?;
         Ok(())
@@ -993,10 +993,6 @@ macro_rules! define_visit {
 
 impl<'a> VisitOperator<'a> for Module<'a> {
     type Output = ();
-
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
 
     wasmparser::for_each_visit_operator!(define_visit);
 }

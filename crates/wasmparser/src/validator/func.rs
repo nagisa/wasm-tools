@@ -96,6 +96,9 @@ impl<T: WasmModuleResources> FuncValidator<T> {
                     .operator_arity(&self.visitor(ops.original_position())),
             );
 
+            #[cfg(feature = "simd")]
+            ops.visit_operator_with_simd(&mut self.simd_visitor(ops.original_position()))??;
+            #[cfg(not(feature = "simd"))]
             ops.visit_operator(&mut self.visitor(ops.original_position()))??;
 
             #[cfg(debug_assertions)]
@@ -184,7 +187,7 @@ impl<T: WasmModuleResources> FuncValidator<T> {
         &'this mut self,
         offset: usize,
     ) -> impl crate::VisitSimdOperator<'a, Output = Result<()>> + ModuleArity + 'this {
-        self.validator.with_resources_simd(&self.resources, offset)
+        self.validator.with_resources(&self.resources, offset)
     }
 
     /// Returns the Wasm features enabled for this validator.

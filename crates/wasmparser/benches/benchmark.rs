@@ -162,7 +162,7 @@ fn read_all_wasm(wasm: &[u8]) -> Result<()> {
                 }
                 let mut ops = body.get_operators_reader()?;
                 while !ops.eof() {
-                    ops.visit_operator(&mut NopVisit)?;
+                    ops.visit_operator_with_simd(&mut NopVisit)?;
                 }
                 ops.finish()?;
             }
@@ -375,10 +375,6 @@ macro_rules! define_visit_operator {
 #[allow(unused_variables)]
 impl<'a> VisitOperator<'a> for NopVisit {
     type Output = ();
-
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
 
     wasmparser::for_each_visit_operator!(define_visit_operator);
 }

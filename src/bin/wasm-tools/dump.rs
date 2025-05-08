@@ -764,7 +764,7 @@ impl<'a> Dump<'a> {
 
     fn print_ops(&mut self, mut i: OperatorsReader) -> Result<()> {
         while !i.eof() {
-            match i.visit_operator(self) {
+            match i.visit_operator_with_simd(self) {
                 Ok(()) => {}
                 Err(_) => write!(self.state, "??")?,
             }
@@ -863,10 +863,6 @@ macro_rules! define_visit_operator {
 
 impl<'a> VisitOperator<'a> for Dump<'_> {
     type Output = ();
-
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
 
     wasmparser::for_each_visit_operator!(define_visit_operator);
 }

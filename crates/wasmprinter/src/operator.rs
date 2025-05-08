@@ -1391,10 +1391,6 @@ macro_rules! define_visit {
 impl<'a> VisitOperator<'a> for PrintOperator<'_, '_, '_, '_> {
     type Output = Result<()>;
 
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
-
     wasmparser::for_each_visit_operator!(define_visit);
 }
 
@@ -1424,7 +1420,7 @@ impl OpPrinter for PrintOperator<'_, '_, '_, '_> {
     }
 
     fn visit_operator(&mut self, reader: &mut OperatorsReader<'_>) -> Result<()> {
-        reader.visit_operator(self)?
+        reader.visit_operator_with_simd(self)?
     }
 
     fn suppress_label_comments(&mut self) {
@@ -1479,7 +1475,7 @@ impl OpPrinter for PrintOperatorFolded<'_, '_, '_, '_> {
 
         let mut op_printer =
             PrintOperator::new(&mut internal_printer, self.state, self.operator_state);
-        reader.visit_operator(&mut op_printer)??;
+        reader.visit_operator_with_simd(&mut op_printer)??;
 
         self.printer.nesting = internal_printer.nesting;
         self.printer.line = internal_printer.line;

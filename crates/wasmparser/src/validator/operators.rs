@@ -471,31 +471,12 @@ impl OperatorValidator {
         self.control.iter().rev().nth(depth)
     }
 
-    /// Create a temporary [`OperatorValidatorTemp`] for validation.
-    pub fn with_resources<'a, 'validator, 'resources, T>(
+    /// Create a temporary [`WasmProposalValidator`] for validation.
+    pub(crate) fn with_resources<'validator, 'resources, T>(
         &'validator mut self,
         resources: &'resources T,
         offset: usize,
-    ) -> impl VisitOperator<'a, Output = Result<()>> + ModuleArity + 'validator
-    where
-        T: WasmModuleResources,
-        'resources: 'validator,
-    {
-        WasmProposalValidator(OperatorValidatorTemp {
-            offset,
-            inner: self,
-            resources,
-        })
-    }
-
-    /// Same as `with_resources` above but guarantees it's able to visit simd
-    /// operators as well.
-    #[cfg(feature = "simd")]
-    pub fn with_resources_simd<'a, 'validator, 'resources, T>(
-        &'validator mut self,
-        resources: &'resources T,
-        offset: usize,
-    ) -> impl VisitSimdOperator<'a, Output = Result<()>> + ModuleArity + 'validator
+    ) -> WasmProposalValidator<'validator, 'resources, T>
     where
         T: WasmModuleResources,
         'resources: 'validator,
@@ -1680,7 +1661,7 @@ pub fn ty_to_str(ty: ValType) -> &'static str {
 /// crate's macro matches the one that's validated here. Each instruction's
 /// visit method validates the specified proposal is enabled and then delegates
 /// to `OperatorValidatorTemp` to perform the actual opcode validation.
-struct WasmProposalValidator<'validator, 'resources, T>(
+pub(crate) struct WasmProposalValidator<'validator, 'resources, T>(
     OperatorValidatorTemp<'validator, 'resources, T>,
 );
 
@@ -1733,11 +1714,6 @@ where
 {
     type Output = Result<()>;
 
-    #[cfg(feature = "simd")]
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
-
     crate::for_each_visit_operator!(validate_proposal);
 }
 
@@ -1769,11 +1745,6 @@ where
     T: WasmModuleResources,
 {
     type Output = Result<()>;
-
-    #[cfg(feature = "simd")]
-    fn simd_visitor(&mut self) -> Option<&mut dyn VisitSimdOperator<'a, Output = Self::Output>> {
-        Some(self)
-    }
 
     fn visit_nop(&mut self) -> Self::Output {
         Ok(())

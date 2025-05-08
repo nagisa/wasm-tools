@@ -212,7 +212,7 @@ impl ModuleState {
         let mut ops = expr.get_operators_reader();
         while !ops.eof() {
             validator.offset = ops.original_position();
-            ops.visit_operator(&mut validator)??;
+            ops.visit_operator_with_simd(&mut validator)??;
         }
 
         // See comment in `RefFunc` below for why this is an assert.
@@ -230,7 +230,13 @@ impl ModuleState {
         }
 
         impl VisitConstOperator<'_> {
+            #[cfg(not(feature = "simd"))]
             fn validator(&mut self) -> impl VisitOperator<'_, Output = Result<()>> {
+                self.ops.with_resources(&self.resources, self.offset)
+            }
+
+            #[cfg(feature = "simd")]
+            fn validator(&mut self) -> impl VisitSimdOperator<'_, Output = Result<()>> {
                 self.ops.with_resources(&self.resources, self.offset)
             }
 
@@ -348,7 +354,7 @@ impl ModuleState {
                 $self.validator().visit_f64_const($val)
             }};
             (@visit $self:ident visit_v128_const $val:ident) => {{
-                $self.validator().simd_visitor().unwrap().visit_v128_const($val)
+                $self.validator().visit_v128_const($val)
             }};
             (@visit $self:ident visit_ref_null $val:ident) => {{
                 $self.validator().visit_ref_null($val)
@@ -443,13 +449,6 @@ impl ModuleState {
 
         impl<'a> VisitOperator<'a> for VisitConstOperator<'a> {
             type Output = Result<()>;
-
-            #[cfg(feature = "simd")]
-            fn simd_visitor(
-                &mut self,
-            ) -> Option<&mut dyn crate::VisitSimdOperator<'a, Output = Self::Output>> {
-                Some(self)
-            }
 
             crate::for_each_visit_operator!(define_visit_operator);
         }
